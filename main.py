@@ -2,6 +2,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from logic import add_contact_to_mailbox , create_contact_data
 from CSVimport import importAliasesFromCSV
 from remove import remove_alias_from_selected_mailboxes
+from dotenv import load_dotenv
+import os
+
+# Загружаем переменные окружения
+load_dotenv()
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -70,16 +75,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addWidget(self.comboBox)
         self.comboBox.setFixedWidth(150)
 
-        # Список ящиков
-        email_list = [
-            "Виберіть поштову скриньку",
-            "Всі",
-            "mukachevo2@transkarpatianriteil.com.ua",
-            "user2@example.com",
-            "user3@example.com",
-            "user4@example.com",
-            "user5@example.com",
-        ]
+        # Получение и преобразование строки в список
+        email_list_str = os.getenv("EMAIL_LIST", "")  # Если нет, возвращаем пустую строку
+        email_list = email_list_str.split(",")  # Преобразуем строку в список
 
         self.setupCheckableComboBox(self.comboBox, email_list)
 
@@ -167,19 +165,17 @@ class Ui_MainWindow(object):
         
         model = QtGui.QStandardItemModel()
         self.comboBox_2.setModel(model)
-        self.comboBox_2.setCurrentText("Виберіть Аліас")
+        # Добавляем пункт "Виберіть Аліас" всегда на первом месте
+        placeholder_item = QtGui.QStandardItem("Виберіть Аліас")
+        placeholder_item.setFlags(QtCore.Qt.ItemIsEnabled)  # Только для чтения
+        model.appendRow(placeholder_item)
 
-        if not self.alias_list:  # Если список алиасов пустой
-            # Если алиасов нет, добавляем элемент "Пусто"
-            item = QtGui.QStandardItem("Виберіть Аліас")
- 
-            model.appendRow(item)
-        else:
-            for alias in self.alias_list:
+        for alias in self.alias_list:
             # Форматируем строку с двумя полями
                 item_text = f"{alias['First Name']} <{alias['EmailAddress']}>"
                 item = QtGui.QStandardItem(item_text)
                 model.appendRow(item)
+        self.comboBox_2.setCurrentText("Виберіть Аліас")
 
     # Добавить новый алиас в список"""
     def addAlias(self):
@@ -201,7 +197,7 @@ class Ui_MainWindow(object):
             msg_box.exec_()
             return
         current_index = self.comboBox_2.currentIndex()
-        if current_index < 0 or self.comboBox_2.currentText() == "Виберіть Аліас":
+        if current_index <=0 :
             # Всплывающее окно предупреждения
             msg_box = QtWidgets.QMessageBox()
             msg_box.setIcon(QtWidgets.QMessageBox.Warning)
@@ -211,18 +207,32 @@ class Ui_MainWindow(object):
             msg_box.exec_()
             return
 
-        del self.alias_list[current_index]
-        self.updateAliasComboBox()
-        # Если список стал пустым, отображаем "Виберіть Аліас"
-        if not self.alias_list:
-            self.comboBox_2.setCurrentText("Виберіть Аліас")
+          # Удаление алиаса: если индекс выбранного элемента больше 0, удаляем алиас
+        selected_alias_index = current_index - 1 
+        if selected_alias_index < len(self.alias_list):
+            del self.alias_list[selected_alias_index]  # Учитываем смещение, так как индекс 0 - это "Виберіть Аліас"
+            self.updateAliasComboBox()  # Обновляем список
+        else:
+            # Если индекс выходит за пределы списка
+            msg_box = QtWidgets.QMessageBox()
+            msg_box.setIcon(QtWidgets.QMessageBox.Warning)
+            msg_box.setWindowTitle("Помилка Видалення")
+            msg_box.setText("Не вдалося знайти аліас для видалення.")
+            msg_box.setStandardButtons(QtWidgets.QMessageBox.Ok)
+            msg_box.exec_()
+            return
+
+        
+    
     # Функция для обработки выбранного алиаса из комбобокса
     def get_selected_alias_from_combobox(self,comboBox):
         """Получить данные выбранного алиаса из combobox."""
         index = comboBox.currentIndex()
-        if index > 0:  # Позиция 0 - это "Выберите алиас"
-            selected_alias = self.alias_list[index - 1]  # Считываем алиас из списка
-            return selected_alias
+        if index <= 0:  # Если выбран пункт "Виберіть Аліас" или ничего не выбрано
+            return None
+        adjusted_index = index - 1  # Корректируем индекс для доступа к self.alias_list
+        if 0 <= adjusted_index < len(self.alias_list):
+            return self.alias_list[adjusted_index]
         else:
             return None
 
@@ -279,17 +289,6 @@ class Ui_MainWindow(object):
             error_msg = "Помилки:\n" + "\n".join(errors)
         else:
             error_msg = ""  
-                    # try:
-                    #     result = add_contact_to_mailbox(mailbox, contact_data)
-                    #     msg_box = QtWidgets.QMessageBox()
-                    #     msg_box.setIcon(QtWidgets.QMessageBox.Information)
-                    #     msg_box.setWindowTitle("Успіх")
-                    #     msg_box.setText(result)
-                    #     msg_box.setText(f"{contact_data['givenName']} доданий у скриньку {mailbox}")
-                    #     msg_box.resize(400, 200)  # Увеличиваем размер окна
-
-                    #     msg_box.exec_()
-                    # except Exception as e:
         msg_box = QtWidgets.QMessageBox()
         msg_box.setIcon(QtWidgets.QMessageBox.Information)
         msg_box.setWindowTitle("Результат")
