@@ -14,103 +14,124 @@ class Ui_MainWindow(object):
         MainWindow.setMinimumSize(530,200)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-
-        # Создаем QTabWidget для вкладок
-        self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
-        self.tabWidget.setGeometry(QtCore.QRect(0, 10, 532, 200))
-        self.tabWidget.setObjectName("tabWidget")
-
+        
+        # Создаем главный вертикальный layout
+        self.mainLayout = QtWidgets.QVBoxLayout(self.centralwidget)
+        
+        # Настраиваем QTabWidget
+        self.tabWidget = QtWidgets.QTabWidget()
+        self.mainLayout.addWidget(self.tabWidget)
 
         # Вкладка "Додати"
         self.addTab = QtWidgets.QWidget()
-        self.addTab.setObjectName("addTab")
-        self.addTabButton = QtWidgets.QPushButton("Додати Контакт", self.addTab)
-        self.addTabButton.setGeometry(QtCore.QRect(360, 20, 125, 23))
-        self.addTabButton.setObjectName("add_contact")
-        self.tabWidget.addTab(self.addTab, "Додати")
+        addTabLayout = QtWidgets.QVBoxLayout(self.addTab)
+        self.addTabButton = QtWidgets.QPushButton("Додати Контакт")
         
-
+        # Добавляем отступ сверху
+        addTabLayout.addSpacing(10)
+        
+        # Создаем горизонтальный layout для выравнивания кнопки справа
+        addButtonLayout = QtWidgets.QHBoxLayout()
+        addButtonLayout.addStretch()
+        addButtonLayout.addWidget(self.addTabButton)
+        addTabLayout.addLayout(addButtonLayout)
+        # Добавляем растягивающийся элемент снизу
+        addTabLayout.addStretch()
+        self.tabWidget.addTab(self.addTab, "Додати")
 
         # Вкладка "Видалити"
         self.removeTab = QtWidgets.QWidget()
-        self.removeTabButton = QtWidgets.QPushButton("Видалити Контакт", self.removeTab)
-        self.removeTabButton.setGeometry(QtCore.QRect(360, 20, 125, 23))
+        removeTabLayout = QtWidgets.QVBoxLayout(self.removeTab)
+        self.removeTabButton = QtWidgets.QPushButton("Видалити Контакт")
+        
+        # Добавляем отступ сверху
+        removeTabLayout.addSpacing(10)
+        
+        removeButtonLayout = QtWidgets.QHBoxLayout()
+        removeButtonLayout.addStretch()
+        removeButtonLayout.addWidget(self.removeTabButton)
+        removeTabLayout.addLayout(removeButtonLayout)
+        # Добавляем растягивающийся элемент снизу
+        removeTabLayout.addStretch()
         self.tabWidget.addTab(self.removeTab, "Видалити")
 
         # Вкладка "Змінити"
         self.editTab = QtWidgets.QWidget()
-        self.editTab.setObjectName("editTab")
-        self.editTabButton = QtWidgets.QPushButton("Змінити Контакт", self.editTab)
-        self.editTabButton.setGeometry(QtCore.QRect(360, 20, 125, 23))
+        editTabLayout = QtWidgets.QVBoxLayout(self.editTab)
+        self.editTabButton = QtWidgets.QPushButton("Змінити Контакт")
+        
+        # Добавляем отступ сверху
+        editTabLayout.addSpacing(10)
+        
+        editButtonLayout = QtWidgets.QHBoxLayout()
+        editButtonLayout.addStretch()
+        editButtonLayout.addWidget(self.editTabButton)
+        editTabLayout.addLayout(editButtonLayout)
+        # Добавляем растягивающийся элемент снизу
+        editTabLayout.addStretch()
         self.tabWidget.addTab(self.editTab, "Змінити")
 
-
-
-
-        self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(0, 46, 321, 41))
-        self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
-        self.horizontalLayout = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
-        self.horizontalLayout.setContentsMargins(10, 0, 0, 0)
-        self.horizontalLayout.setObjectName("horizontalLayout")
-        self.label_mail = QtWidgets.QLabel(self.horizontalLayoutWidget)
-        self.label_mail.setObjectName("label_mail")
-        self.horizontalLayout.addWidget(self.label_mail)
-
-        self.label_alias = QtWidgets.QLabel(self.horizontalLayoutWidget)
-        self.label_alias.setObjectName("label_alias")
-        self.horizontalLayout.addWidget(self.label_alias)
-
-        self.horizontalLayoutWidget_2 = QtWidgets.QWidget(self.centralwidget)
-        self.horizontalLayoutWidget_2.setGeometry(QtCore.QRect(0, 70, 321, 80))
-        self.horizontalLayoutWidget_2.setObjectName("horizontalLayoutWidget_2")
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget_2)
-        self.horizontalLayout_2.setContentsMargins(10, 0, 0, 0)
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-
-        # Настройка comboBox с чекбоксами
-        self.comboBox = QtWidgets.QComboBox(self.horizontalLayoutWidget_2)
-        self.comboBox.setView(QtWidgets.QListView())  # Используем QListView для отображения чекбоксов
-        self.comboBox.setObjectName("comboBox")
-        self.horizontalLayout_2.addWidget(self.comboBox)
-        self.comboBox.setFixedWidth(150)
-
-        # Получение и преобразование строки в список
-        email_list_str = os.getenv("EMAIL_LIST", "")  # Если нет, возвращаем пустую строку
-        email_list = email_list_str.split(",")
-
-
-       
+        # Создаем layout для комбобоксов и меток
+        comboBoxContainer = QtWidgets.QWidget()
+        comboBoxMainLayout = QtWidgets.QHBoxLayout(comboBoxContainer)
         
-        self.setupCheckableComboBox(self.comboBox, email_list)
-
+        # Создаем вертикальные layouts для каждой пары метка+комбобокс
+        mailboxLayout = QtWidgets.QVBoxLayout()
+        aliasLayout = QtWidgets.QVBoxLayout()
+        
+        # Настраиваем метки
+        self.label_mail = QtWidgets.QLabel("Поштові Скриньки")
+        self.label_alias = QtWidgets.QLabel("Аліаси")
+        
+        # Настройка comboBox с чекбоксами
+        self.comboBox = QtWidgets.QComboBox()
+        self.comboBox.setView(QtWidgets.QListView())
+        self.comboBox.setFixedWidth(150)
+        
         # Настройка comboBox_2 для алиасов
-        self.comboBox_2 = QtWidgets.QComboBox(self.horizontalLayoutWidget_2)
-        self.comboBox_2.setObjectName("comboBox_2")
+        self.comboBox_2 = QtWidgets.QComboBox()
         self.comboBox_2.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContents)
-        self.horizontalLayout_2.addWidget(self.comboBox_2)
         self.comboBox_2.setFixedWidth(150)
         
-
-        # Кнопки для управления алиасами
-        self.addAliasButton = QtWidgets.QPushButton(self.centralwidget)
-        self.addAliasButton.setGeometry(QtCore.QRect(330, 100, 85, 23))
-        self.addAliasButton.setObjectName("addAliasButton")
-
-        self.removeAliasButton = QtWidgets.QPushButton(self.centralwidget)
-        self.removeAliasButton.setGeometry(QtCore.QRect(430, 100, 90, 23))
-        self.removeAliasButton.setObjectName("removeAliasButton")
-
-        # Кнопка импорта алиасов из CSV
-        self.importCsvButton = QtWidgets.QPushButton(self.centralwidget)
-        self.importCsvButton.setGeometry(QtCore.QRect(430, 130, 90, 23))
-        self.importCsvButton.setObjectName("importCsvButton")
-
-        # Список алиасов
+        # Инициализируем список алиасов
         self.alias_list = []
-        self.updateAliasComboBox()
-
         
+        # Добавляем элементы в вертикальные layouts
+        mailboxLayout.addWidget(self.label_mail)
+        mailboxLayout.addWidget(self.comboBox)
+        
+        aliasLayout.addWidget(self.label_alias)
+        aliasLayout.addWidget(self.comboBox_2)
+        
+        # Создаем вертикальный layout для кнопок управления
+        buttonLayout = QtWidgets.QVBoxLayout()
+        
+        # Создаем кнопки
+        self.addAliasButton = QtWidgets.QPushButton("Додати Аліас")
+        self.removeAliasButton = QtWidgets.QPushButton("Видалити Аліас")
+        self.importCsvButton = QtWidgets.QPushButton("Імпорт з CSV")
+        
+        # Добавляем пустое пространство сверху кнопок для выравнивания с комбобоксами
+        buttonLayout.addSpacing(self.label_mail.sizeHint().height())
+        buttonLayout.addWidget(self.addAliasButton)
+        buttonLayout.addWidget(self.removeAliasButton)
+        buttonLayout.addWidget(self.importCsvButton)
+        
+        # Добавляем все layouts в основной горизонтальный
+        comboBoxMainLayout.addLayout(mailboxLayout)
+        comboBoxMainLayout.addLayout(aliasLayout)
+        comboBoxMainLayout.addLayout(buttonLayout)
+        
+        # Добавляем контейнер в главный layout
+        self.mainLayout.addWidget(comboBoxContainer)
+
+        # Получение и преобразование строки в список для почтовых ящиков
+        email_list_str = os.getenv("EMAIL_LIST", "")
+        email_list = email_list_str.split(",")
+        self.setupCheckableComboBox(self.comboBox, email_list)
+
+        # Обновляем комбобокс алиасов
+        self.updateAliasComboBox()
 
         # Подключение кнопок
         self.addTabButton.clicked.connect(self.add_contact_to_selected_mailboxes)
