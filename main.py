@@ -77,8 +77,11 @@ class Ui_MainWindow(object):
 
         # Получение и преобразование строки в список
         email_list_str = os.getenv("EMAIL_LIST", "")  # Если нет, возвращаем пустую строку
-        email_list = email_list_str.split(",")  # Преобразуем строку в список
+        email_list = email_list_str.split(",")
 
+
+       
+        
         self.setupCheckableComboBox(self.comboBox, email_list)
 
         # Настройка comboBox_2 для алиасов
