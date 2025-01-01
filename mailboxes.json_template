@@ -1,0 +1,10 @@
+{
+    "EMAIL_LIST": [
+        "Виберіть поштову скриньку",
+        "Всі",
+        "user2@example.com",
+        "user3@example.com",
+        "user4@example.com",
+        "user5@example.com"
+    ]
+}

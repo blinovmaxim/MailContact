@@ -1,77 +1,34 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from logic import add_contact_to_mailbox , create_contact_data
+from logic import add_contact_to_mailbox, create_contact_data
 from CSVimport import importAliasesFromCSV
 from remove import remove_alias_from_selected_mailboxes
 from dotenv import load_dotenv
 import os
+import json  # Добавляем импорт json
 
 # Загружаем переменные окружения
 load_dotenv()
 
+# Заменяем загрузку из .env на загрузку из JSON
+def load_email_list():
+    try:
+        with open('mailboxes.json', 'r', encoding='utf-8') as file:
+            data = json.load(file)
+            return data.get("EMAIL_LIST", [])
+    except Exception as e:
+        print(f"Помилка при читанні файла mailboxes.json: {e}")
+        return []
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        # MainWindow.setMinimumSize(830,400)
-        MainWindow.setMinimumSize(530,300)
+        MainWindow.setMinimumSize(500, 70)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         
         # Создаем главный вертикальный layout
         self.mainLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         
-        # Настраиваем QTabWidget
-        self.tabWidget = QtWidgets.QTabWidget()
-        self.mainLayout.addWidget(self.tabWidget)
-
-        # Вкладка "Додати"
-        self.addTab = QtWidgets.QWidget()
-        addTabLayout = QtWidgets.QVBoxLayout(self.addTab)
-        self.addTabButton = QtWidgets.QPushButton("Додати Контакт")
-        
-        # Добавляем отступ сверху
-        addTabLayout.addSpacing(10)
-        
-        # Создаем горизонтальный layout для выравнивания кнопки справа
-        addButtonLayout = QtWidgets.QHBoxLayout()
-        addButtonLayout.addStretch()
-        addButtonLayout.addWidget(self.addTabButton)
-        addTabLayout.addLayout(addButtonLayout)
-        # Добавляем растягивающийся элемент снизу
-        addTabLayout.addStretch()
-        self.tabWidget.addTab(self.addTab, "Додати")
-
-        # Вкладка "Видалити"
-        self.removeTab = QtWidgets.QWidget()
-        removeTabLayout = QtWidgets.QVBoxLayout(self.removeTab)
-        self.removeTabButton = QtWidgets.QPushButton("Видалити Контакт")
-        
-        # Добавляем отступ сверху
-        removeTabLayout.addSpacing(10)
-        
-        removeButtonLayout = QtWidgets.QHBoxLayout()
-        removeButtonLayout.addStretch()
-        removeButtonLayout.addWidget(self.removeTabButton)
-        removeTabLayout.addLayout(removeButtonLayout)
-        # Добавляем растягивающийся элемент снизу
-        removeTabLayout.addStretch()
-        self.tabWidget.addTab(self.removeTab, "Видалити")
-
-        # Вкладка "Змінити"
-        self.editTab = QtWidgets.QWidget()
-        editTabLayout = QtWidgets.QVBoxLayout(self.editTab)
-        self.editTabButton = QtWidgets.QPushButton("Змінити Контакт")
-        
-        # Добавляем отступ сверху
-        editTabLayout.addSpacing(10)
-        
-        editButtonLayout = QtWidgets.QHBoxLayout()
-        editButtonLayout.addStretch()
-        editButtonLayout.addWidget(self.editTabButton)
-        editTabLayout.addLayout(editButtonLayout)
-        # Добавляем растягивающийся элемент снизу
-        editTabLayout.addStretch()
-        self.tabWidget.addTab(self.editTab, "Змінити")
-
         # Создаем layout для комбобоксов и меток
         comboBoxContainer = QtWidgets.QWidget()
         comboBoxMainLayout = QtWidgets.QHBoxLayout(comboBoxContainer)
@@ -98,11 +55,19 @@ class Ui_MainWindow(object):
         self.alias_list = []
         
         # Добавляем элементы в вертикальные layouts
+        mailboxLayout.addSpacing(26)  # Добавляем отступ перед меткой
         mailboxLayout.addWidget(self.label_mail)
         mailboxLayout.addWidget(self.comboBox)
+        mailboxLayout.addStretch()  # Добавляем растяжение для выравнивания
         
+        aliasLayout.addSpacing(26)  # Добавляем отступ перед меткой
         aliasLayout.addWidget(self.label_alias)
         aliasLayout.addWidget(self.comboBox_2)
+        
+        # Создаем кнопку "Очистить"
+        self.clearAliasButton = QtWidgets.QPushButton("Очистити Аліаси")
+        aliasLayout.addWidget(self.clearAliasButton)  # Перемещаем кнопку "Очистить" сюда
+        aliasLayout.addStretch()  # Добавляем растяжение для выравнивания
         
         # Создаем вертикальный layout для кнопок управления
         buttonLayout = QtWidgets.QVBoxLayout()
@@ -117,6 +82,7 @@ class Ui_MainWindow(object):
         buttonLayout.addWidget(self.addAliasButton)
         buttonLayout.addWidget(self.removeAliasButton)
         buttonLayout.addWidget(self.importCsvButton)
+        buttonLayout.addStretch()  # Добавляем растяжение для выравнивания
         
         # Добавляем все layouts в основной горизонтальный
         comboBoxMainLayout.addLayout(mailboxLayout)
@@ -126,30 +92,52 @@ class Ui_MainWindow(object):
         # Добавляем контейнер в главный layout
         self.mainLayout.addWidget(comboBoxContainer)
 
-        # Получение и преобразование строки в список для почтовых ящиков
-        email_list_str = os.getenv("EMAIL_LIST", "")
-        email_list = email_list_str.split(",")
+        # Подключаем кнопку "Очистить" к функции очистки
+        self.clearAliasButton.clicked.connect(self.clearAliasComboBox)
+
+        # На эту:
+        email_list = load_email_list()
+        
         self.setupCheckableComboBox(self.comboBox, email_list)
 
         # Обновляем комбобокс алиасов
         self.updateAliasComboBox()
 
-        # Подключение кнопок
-        self.addTabButton.clicked.connect(self.add_contact_to_selected_mailboxes)
+        # Создаем панель инструментов
+        self.toolBar = QtWidgets.QToolBar(MainWindow)
+        MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
+
+        # Устанавливаем стиль кнопок панели инструментов
+        self.toolBar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
+
+        # Убираем возможность перемещения панели инструментов
+        self.toolBar.setMovable(False)
+
+        # Переносим существующие кнопки на панель инструментов
+        self.addTabButton = QtWidgets.QAction(QtGui.QIcon("icons/add.png"), "Добавить", self.toolBar)
+        self.removeTabButton = QtWidgets.QAction(QtGui.QIcon("icons/remove.png"), "Удалить", self.toolBar)
+        self.editTabButton = QtWidgets.QAction(QtGui.QIcon("icons/edit.png"), "Редактировать", self.toolBar)
+
+        # Добавляем кнопки на панель инструментов
+        self.toolBar.addAction(self.addTabButton)
+        self.toolBar.addAction(self.removeTabButton)
+        self.toolBar.addAction(self.editTabButton)
+
+        # Подключаем действия к функциям
+        self.addTabButton.triggered.connect(self.add_contact_to_selected_mailboxes)
+        self.removeTabButton.triggered.connect(self.remove_alias_from_selected_mailboxes)
+        self.editTabButton.triggered.connect(self.edit_action)
         self.addAliasButton.clicked.connect(self.addAlias)
         self.removeAliasButton.clicked.connect(self.removeAlias)
         self.importCsvButton.clicked.connect(self.importAliasesFromCSV)
-        self.removeTabButton.clicked.connect(self.remove_alias_from_selected_mailboxes)
-        self.editTabButton.clicked.connect(self.edit_action)
-
+        
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
     
-    # Настроить QComboBox Поштові Скриньки с чекбоксами"""
+    # Настроить QComboBox Поштові Скриньки с чекбоксами
     def setupCheckableComboBox(self, comboBox, items):
-
         model = QtGui.QStandardItemModel()
         comboBox.setModel(model)
 
@@ -168,7 +156,7 @@ class Ui_MainWindow(object):
         # Обработчик изменений состояния чекбоксов
         model.itemChanged.connect(lambda item: self.on_item_changed(item, model))
 
-    # Обработчик изменения состояния чекбоксов"""
+    # Обработчик изменения состояния чекбоксов
     def on_item_changed(self, item, model):
         if item.text() == "Виберіть поштову скриньку":
             return  # Игнорируем изменения для первого элемента
@@ -185,9 +173,8 @@ class Ui_MainWindow(object):
             model.item(1).setCheckState(QtCore.Qt.Checked if all_checked else QtCore.Qt.Unchecked)
         model.blockSignals(False)
 
-    # Обновить содержимое comboBox_2 Аліаси на основе alias_list"""
+    # Обновить содержимое comboBox_2 Аліаси на основе alias_list
     def updateAliasComboBox(self):
-        
         model = QtGui.QStandardItemModel()
         self.comboBox_2.setModel(model)
         # Добавляем пункт "Виберіть Аліас" всегда на первом месте
@@ -197,12 +184,12 @@ class Ui_MainWindow(object):
 
         for alias in self.alias_list:
             # Форматируем строку с двумя полями
-                item_text = f"{alias['First Name']} <{alias['EmailAddress']}>"
-                item = QtGui.QStandardItem(item_text)
-                model.appendRow(item)
+            item_text = f"{alias['First Name']} <{alias['EmailAddress']}>"
+            item = QtGui.QStandardItem(item_text)
+            model.appendRow(item)
         self.comboBox_2.setCurrentText("Виберіть Аліас")
 
-    # Добавить новый алиас в список"""
+    # Добавить новый алиас в список
     def addAlias(self):
         alias_name, ok = QtWidgets.QInputDialog.getText(None, "Додати аліас", "Введіть ім'я аліасу:")
         alias_email, ok_email = QtWidgets.QInputDialog.getText(None, "Додати аліас", "Введіть пошту аліасу:")
@@ -211,7 +198,7 @@ class Ui_MainWindow(object):
             self.alias_list.append({"First Name": alias_name.strip(), "EmailAddress": alias_email.strip()})
             self.updateAliasComboBox()
 
-    # Удалить выбранный алиас из списка"""
+    # Удалить выбранный алиас из списка
     def removeAlias(self):
         if not self.alias_list:  # Проверяем, есть ли алиасы
             msg_box = QtWidgets.QMessageBox()
@@ -222,7 +209,7 @@ class Ui_MainWindow(object):
             msg_box.exec_()
             return
         current_index = self.comboBox_2.currentIndex()
-        if current_index <=0 :
+        if current_index <= 0:
             # Всплывающее окно предупреждения
             msg_box = QtWidgets.QMessageBox()
             msg_box.setIcon(QtWidgets.QMessageBox.Warning)
@@ -232,8 +219,8 @@ class Ui_MainWindow(object):
             msg_box.exec_()
             return
 
-          # Удаление алиаса: если индекс выбранного элемента больше 0, удаляем алиас
-        selected_alias_index = current_index - 1 
+        # Удаление алиаса: если индекс выбранного элемента больше 0, удаляем алиас
+        selected_alias_index = current_index - 1
         if selected_alias_index < len(self.alias_list):
             del self.alias_list[selected_alias_index]  # Учитываем смещение, так как индекс 0 - это "Виберіть Аліас"
             self.updateAliasComboBox()  # Обновляем список
@@ -247,10 +234,8 @@ class Ui_MainWindow(object):
             msg_box.exec_()
             return
 
-        
-    
     # Функция для обработки выбранного алиаса из комбобокса
-    def get_selected_alias_from_combobox(self,comboBox):
+    def get_selected_alias_from_combobox(self, comboBox):
         """Получить данные выбранного алиаса из combobox."""
         index = comboBox.currentIndex()
         if index <= 0:  # Если выбран пункт "Виберіть Аліас" или ничего не выбрано
@@ -261,7 +246,7 @@ class Ui_MainWindow(object):
         else:
             return None
 
-    # Добавить контакт в выбранные почтовые ящики"""
+    # Добавить контакт в выбранные почтовые ящики
     def add_contact_to_selected_mailboxes(self):
         # Получаем выбранный алиас
         all_aliases = self.alias_list
@@ -274,12 +259,11 @@ class Ui_MainWindow(object):
             msg_box.exec_()
             return
 
-    
         selected_mailboxes = []
         for index in range(1, self.comboBox.count()):
-                item = self.comboBox.model().item(index)
-                if item.checkState() == QtCore.Qt.Checked:
-                    selected_mailboxes.append(item.text())
+            item = self.comboBox.model().item(index)
+            if item.checkState() == QtCore.Qt.Checked:
+                selected_mailboxes.append(item.text())
 
         if not selected_mailboxes:
             msg_box = QtWidgets.QMessageBox()
@@ -289,11 +273,12 @@ class Ui_MainWindow(object):
             msg_box.resize(400, 200)  # Увеличиваем размер окна
             msg_box.exec_()
             return
-            # Список для успешных добавлений
+
+        # Список для успешных добавлений
         added_contacts = []
         errors = []
 
-         # Создаем и добавляем контакт для каждого алиаса
+        # Создаем и добавляем контакт для каждого алиаса
         for alias in all_aliases:
             contact_data = create_contact_data(alias["First Name"], alias["EmailAddress"])
             # Добавляем контакт в каждый выбранный ящик
@@ -303,17 +288,18 @@ class Ui_MainWindow(object):
                     added_contacts.append(f"{contact_data['givenName']} -> {mailbox}")
                 except Exception as e:
                     errors.append(f"Не вдалось додати {contact_data['givenName']} у {mailbox}: {e}")
-            # Итоговое сообщение об успешных добавлениях
+
+        # Итоговое сообщение об успешных добавлениях
         if added_contacts:
             success_msg = "Додані контакти:\n" + "\n".join(added_contacts)
         else:
             success_msg = "Жоден контакт не було додано."
 
-            # Итоговое сообщение об ошибках (если есть)
+        # Итоговое сообщение об ошибках (если есть)
         if errors:
             error_msg = "Помилки:\n" + "\n".join(errors)
         else:
-            error_msg = ""  
+            error_msg = ""
         msg_box = QtWidgets.QMessageBox()
         msg_box.setIcon(QtWidgets.QMessageBox.Information)
         msg_box.setWindowTitle("Результат")
@@ -329,9 +315,7 @@ class Ui_MainWindow(object):
 
     def edit_action(self):
         edit_action(self)
-    
-    
-    
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Контакти ТКР"))
@@ -344,17 +328,27 @@ class Ui_MainWindow(object):
         self.removeTabButton.setText(_translate("MainWindow", "Видалити Контакти"))
         self.editTabButton.setText(_translate("MainWindow", "Змінити Контакти"))
 
+    def clearAliasComboBox(self):
+        """Очищает комбобокс алиасов и список алиасов."""
+        self.alias_list.clear()
+        self.updateAliasComboBox()
+        msg_box = QtWidgets.QMessageBox()
+        msg_box.setIcon(QtWidgets.QMessageBox.Information)
+        msg_box.setWindowTitle("Очистка")
+        msg_box.setText("Аліаси успішно очищені.")
+        msg_box.exec_()
+
 
 if __name__ == "__main__":
     import sys
-   
+    
     
     # Включаем поддержку масштабирования для дисплеев с высоким разрешением
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
-    
 
     app = QtWidgets.QApplication(sys.argv)
+    
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)

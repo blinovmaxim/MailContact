@@ -1,10 +1,3 @@
 TENANT_ID = ""
 CLIENT_ID = ""
 CLIENT_SECRET = ""
-EMAIL_LIST = "Виберіть поштову скриньку,
-            Всі,
-            user1@example.com,
-            user2@example.com,
-            user3@example.com,
-            user4@example.com,
-            user5@example.com"
