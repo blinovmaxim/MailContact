@@ -7,7 +7,7 @@ import os
 import json  # Добавляем импорт json
 from edit import edit_action
 import time
-
+import sys
 
 # Загружаем переменные окружения
 load_dotenv()
@@ -15,7 +15,8 @@ load_dotenv()
 # Заменяем загрузку из .env на загрузку из JSON
 def load_email_list():
     try:
-        with open('mailboxes.json', 'r', encoding='utf-8') as file:
+        json_path = resource_path('mailboxes.json')  # Используем существующую функцию resource_path
+        with open(json_path, 'r', encoding='utf-8') as file:
             data = json.load(file)
             return data.get("EMAIL_LIST", [])
     except Exception as e:
