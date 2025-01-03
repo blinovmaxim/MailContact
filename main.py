@@ -5,6 +5,7 @@ from remove import remove_alias_from_selected_mailboxes
 from dotenv import load_dotenv
 import os
 import json  # Добавляем импорт json
+from edit import edit_action
 
 # Загружаем переменные окружения
 load_dotenv()
