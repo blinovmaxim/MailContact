@@ -1,0 +1,169 @@
+/* Основные стили */
+QMainWindow {
+    background-color: #f0f2f5;
+}
+
+QWidget {
+    font-family: 'Segoe UI', Arial;
+    font-size: 12px;
+}
+
+/* Общие стили для всех кнопок */
+QPushButton, QToolBar QToolButton {
+    background-color: #4A90E2;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    min-width: 100px;
+    font-weight: bold;
+}
+
+QPushButton:hover, QToolBar QToolButton:hover {
+    background-color: #357ABD;
+}
+
+QPushButton:pressed, QToolBar QToolButton:pressed {
+    background-color: #2E6DA4;
+    padding: 9px 16px 7px 16px;
+}
+
+/* Специальные стили для кнопок на панели инструментов */
+QToolBar QToolButton[text="Додати у Контакти"] {
+    background-color: #2ECC71;
+}
+
+QToolBar QToolButton[text="Додати у Контакти"]:hover {
+    background-color: #27AE60;
+}
+
+QToolBar QToolButton[text="Додати у Контакти"]:pressed {
+    background-color: #219A52;
+}
+
+QToolBar QToolButton[text="Видалити Контакти"] {
+    background-color: #E74C3C;
+}
+
+QToolBar QToolButton[text="Видалити Контакти"]:hover {
+    background-color: #C0392B;
+}
+
+QToolBar QToolButton[text="Видалити Контакти"]:pressed {
+    background-color: #A93226;
+}
+
+QToolBar QToolButton[text="Змінити Контакти"] {
+    background-color: #3498DB;
+}
+
+QToolBar QToolButton[text="Змінити Контакти"]:hover {
+    background-color: #2980B9;
+}
+
+QToolBar QToolButton[text="Змінити Контакти"]:pressed {
+    background-color: #2471A3;
+}
+
+/* Стили для панели инструментов */
+QToolBar {
+    background-color: white;
+    border-bottom: 1px solid #dcdcdc;
+    spacing: 15px;
+    padding: 10px;
+}
+
+/* Отключенное состояние для всех кнопок */
+QPushButton:disabled, QToolBar QToolButton:disabled {
+    background-color: #CCCCCC;
+    color: #666666;
+}
+
+/* Улучшенные стили для комбобоксов */
+QComboBox {
+    background-color: white;
+    border: 1px solid #cccccc;
+    padding: 5px;
+    min-height: 25px;
+}
+
+QComboBox:hover {
+    border: 1px solid #999999;
+}
+
+QComboBox QAbstractItemView {
+    border: 1px solid #cccccc;
+    selection-background-color: #999999;
+    selection-color: white;
+    background-color: white;
+    padding: 5px;
+}
+
+/* Улучшенные стили для меток */
+QLabel {
+    color: #2C3E50;
+    font-weight: bold;
+    padding: 2px;
+}
+
+/* Стили для всплывающих окон */
+QMessageBox {
+    background-color: white;
+}
+
+QMessageBox QPushButton {
+    min-width: 80px;
+    padding: 6px 14px;
+}
+
+/* Стили для полос прокрутки */
+QScrollBar:vertical {
+    border: none;
+    background-color: #f0f2f5;
+    width: 10px;
+    margin: 0px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #c1c1c1;
+    border-radius: 5px;
+    min-height: 20px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: #a8a8a8;
+}
+
+/* Эффект фокуса для элементов */
+QWidget:focus {
+    outline: none;
+}
+
+QComboBox:focus {
+    border: 1px solid #4A90E2;
+}
+
+/* Стили для кнопок действий */
+QAction#addTabButton {
+    background-color: #2ECC71;
+    color: white;
+    font-weight: bold;
+    padding: 8px 12px;
+    border-radius: 4px;
+}
+
+QAction#removeTabButton {
+    background-color: #E74C3C;
+    color: white;
+    font-weight: bold;
+    padding: 8px 12px;
+    border-radius: 4px;
+}
+
+QAction#editTabButton {
+    background-color: #3498DB;
+    color: white;
+    font-weight: bold;
+    padding: 8px 12px;
+    border-radius: 4px;
+}

@@ -23,7 +23,7 @@ def load_email_list():
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.setMinimumSize(500, 70)
+        
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         
@@ -56,20 +56,23 @@ class Ui_MainWindow(object):
         self.alias_list = []
         
         # Добавляем элементы в вертикальные layouts
-        mailboxLayout.addSpacing(26)  # Добавляем отступ перед меткой
+
         mailboxLayout.addWidget(self.label_mail)
         mailboxLayout.addWidget(self.comboBox)
         mailboxLayout.addStretch()  # Добавляем растяжение для выравнивания
         
-        aliasLayout.addSpacing(26)  # Добавляем отступ перед меткой
+        # aliasLayout.addSpacing(26)  # Добавляем отступ перед меткой
         aliasLayout.addWidget(self.label_alias)
         aliasLayout.addWidget(self.comboBox_2)
+        aliasLayout.addSpacing(25)  # Простой отступ в 20 пикселей
         
         # Создаем кнопку "Очистить"
         self.clearAliasButton = QtWidgets.QPushButton("Очистити Аліаси")
-        aliasLayout.addWidget(self.clearAliasButton)  # Перемещаем кнопку "Очистить" сюда
-        aliasLayout.addStretch()  # Добавляем растяжение для выравнивания
+
         
+
+        aliasLayout.addWidget(self.clearAliasButton)
+
         # Создаем вертикальный layout для кнопок управления
         buttonLayout = QtWidgets.QVBoxLayout()
         
@@ -115,9 +118,14 @@ class Ui_MainWindow(object):
         self.toolBar.setMovable(False)
 
         # Переносим существующие кнопки на панель инструментов
-        self.addTabButton = QtWidgets.QAction(QtGui.QIcon("icons/add.png"), "Добавить", self.toolBar)
-        self.removeTabButton = QtWidgets.QAction(QtGui.QIcon("icons/remove.png"), "Удалить", self.toolBar)
-        self.editTabButton = QtWidgets.QAction(QtGui.QIcon("icons/edit.png"), "Редактировать", self.toolBar)
+        self.addTabButton = QtWidgets.QAction(self.toolBar)
+        self.removeTabButton = QtWidgets.QAction(self.toolBar)
+        self.editTabButton = QtWidgets.QAction(self.toolBar)
+
+        self.addTabButton.setObjectName("addTabButton")
+        self.removeTabButton.setObjectName("removeTabButton")
+        self.editTabButton.setObjectName("editTabButton")
+
 
         # Добавляем кнопки на панель инструментов
         self.toolBar.addAction(self.addTabButton)
@@ -349,8 +357,18 @@ if __name__ == "__main__":
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
 
     app = QtWidgets.QApplication(sys.argv)
-    
+
+    # Загружаем стили
+    with open('styles.qss', 'r') as style_file:
+        app.setStyleSheet(style_file.read())
+
     MainWindow = QtWidgets.QMainWindow()
+    icon = QtGui.QIcon("icons/icon.png")  # или .png
+    MainWindow.setWindowIcon(icon)
+
+
+    MainWindow.setFixedSize(500, 200) 
+
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
