@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 import os
 import json  # Добавляем импорт json
 from edit import edit_action
+import time
+
 
 # Загружаем переменные окружения
 load_dotenv()
@@ -19,6 +21,10 @@ def load_email_list():
     except Exception as e:
         print(f"Помилка при читанні файла mailboxes.json: {e}")
         return []
+
+def resource_path(relative_path):
+    """Получить путь к файлу относительно текущей директории"""
+    return os.path.join(os.path.dirname(__file__), relative_path)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -350,6 +356,7 @@ class Ui_MainWindow(object):
 
 if __name__ == "__main__":
     import sys
+    import time
     
     
     # Включаем поддержку масштабирования для дисплеев с высоким разрешением
@@ -358,15 +365,13 @@ if __name__ == "__main__":
 
     app = QtWidgets.QApplication(sys.argv)
 
-    # Загружаем стили
-    with open('styles.qss', 'r') as style_file:
+    # Загружаем стили и применяем их к приложению
+    with open(resource_path('styles.qss'), 'r', encoding='utf-8') as style_file:
         app.setStyleSheet(style_file.read())
 
     MainWindow = QtWidgets.QMainWindow()
-    icon = QtGui.QIcon("icons/icon.png")  # или .png
+    icon = QtGui.QIcon(resource_path('icons/icon.png'))
     MainWindow.setWindowIcon(icon)
-
-
     MainWindow.setFixedSize(500, 200) 
 
     ui = Ui_MainWindow()
