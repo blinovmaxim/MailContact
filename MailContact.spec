@@ -1,7 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 added_files = [
-    ('.env', '.'),          # Файл .env в корневую директорию
+    ('.env', '.'),          # .env файл в корневую директорию
     ('styles.qss', '.'),     # Файл стилей в корневую директорию
     ('mailboxes.json', '.'),     # JSON-файл в корневую директорию
     ('icons/', 'icons')     # Папка с иконками в директорию icons
@@ -12,7 +12,15 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=added_files,
-    hiddenimports=[],
+    hiddenimports=[
+        'requests',
+        'python-dotenv',
+        'PyQt5',
+        'csv',
+        'json',
+        'os',
+        'dotenv'
+    ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -25,26 +33,19 @@ pyz = PYZ(a.pure)
 exe = EXE(
     pyz,
     a.scripts,
+    a.binaries,
+    a.datas,
     [],
-    exclude_binaries=True,
+    exclude_binaries=False,
     name='MailContact',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=True,
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-)
-coll = COLLECT(
-    exe,
-    a.binaries,
-    a.datas,
-    strip=False,
-    upx=True,
-    upx_exclude=[],
-    name='MailContact',
 )

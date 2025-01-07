@@ -1,15 +1,29 @@
 import requests
 from dotenv import load_dotenv
 import os
+import sys
+
+def get_base_path():
+    """Получаем путь к директории с исполняемым файлом"""
+    if getattr(sys, 'frozen', False):
+        # Если приложение скомпилировано
+        return sys._MEIPASS
+    else:
+        # Если запущено как скрипт
+        return os.path.dirname(os.path.abspath(__file__))
 
 # Загружаем переменные окружения
-load_dotenv()
+env_path = os.path.join(get_base_path(), '.env')
+load_dotenv(env_path)
 
 # Параметры для работы с Azure AD
 TenantId = os.getenv("TENANT_ID")
 ClientId = os.getenv("CLIENT_ID")
 ClientSecret = os.getenv("CLIENT_SECRET")
 
+# Добавьте проверку
+if not all([TenantId, ClientId, ClientSecret]):
+    raise Exception("Не вдалося завантажити конфігурацію з .env файлу")
 
 # Получение токена
 def get_access_token():
