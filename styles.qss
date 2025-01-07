@@ -12,7 +12,7 @@ QWidget {
 QPushButton, QToolBar QToolButton {
     background-color: #4A90E2;
     color: white;
-    border: none;
+    border: 1px solid #357ABD;
     padding: 6px 16px;
     border-radius: 4px;
     min-width: 100px;
@@ -21,11 +21,14 @@ QPushButton, QToolBar QToolButton {
 
 QPushButton:hover, QToolBar QToolButton:hover {
     background-color: #357ABD;
+    border: 1px solid #2E6DA4;
 }
 
 QPushButton:pressed, QToolBar QToolButton:pressed {
     background-color: #2E6DA4;
-    padding: 9px 16px 7px 16px;
+    border: 1px solid #2E6DA4;
+    padding-top: 7px;
+    padding-bottom: 5px;
 }
 
 /* Специальные стили для кнопок на панели инструментов */
@@ -68,9 +71,11 @@ QToolBar QToolButton[text="Змінити Контакти"]:pressed {
 /* Стили для панели инструментов */
 QToolBar {
     background-color: white;
-    border-bottom: 1px solid #dcdcdc;
+    border-bottom: 2px solid #dcdcdc;
     spacing: 15px;
     padding: 10px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                              stop:0 #ffffff, stop:1 #f0f2f5);
 }
 
 /* Отключенное состояние для всех кнопок */
@@ -166,4 +171,15 @@ QAction#editTabButton {
     font-weight: bold;
     padding: 8px 12px;
     border-radius: 4px;
+}
+
+QPushButton#importCsvButton {
+    min-height: 40px;
+    padding: 7px;
+    margin: 2px;
+}
+
+/* Добавить тень для кнопок */
+QPushButton {
+    border: none;
 }

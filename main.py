@@ -33,13 +33,16 @@ class Ui_MainWindow(object):
         
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
+ 
         
         # Создаем главный вертикальный layout
         self.mainLayout = QtWidgets.QVBoxLayout(self.centralwidget)
+        self.mainLayout.setContentsMargins(10, 0, 10, 10)  # Уменьшаем отступы
         
         # Создаем layout для комбобоксов и меток
         comboBoxContainer = QtWidgets.QWidget()
         comboBoxMainLayout = QtWidgets.QHBoxLayout(comboBoxContainer)
+        comboBoxMainLayout.setContentsMargins(0, 0, 0, 0)  # Убираем отступы
         
         # Создаем вертикальные layouts для каждой пары метка+комбобокс
         mailboxLayout = QtWidgets.QVBoxLayout()
@@ -57,51 +60,64 @@ class Ui_MainWindow(object):
         # Настройка comboBox_2 для алиасов
         self.comboBox_2 = QtWidgets.QComboBox()
         self.comboBox_2.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContents)
-        self.comboBox_2.setFixedWidth(150)
+        self.comboBox_2.setFixedWidth(155)
         
         # Инициализируем список алиасов
         self.alias_list = []
         
         # Добавляем элементы в вертикальные layouts
-
         mailboxLayout.addWidget(self.label_mail)
         mailboxLayout.addWidget(self.comboBox)
         mailboxLayout.addStretch()  # Добавляем растяжение для выравнивания
         
-        # aliasLayout.addSpacing(26)  # Добавляем отступ перед меткой
+        # Настраиваем layout для алиасов без лишних отступов
         aliasLayout.addWidget(self.label_alias)
         aliasLayout.addWidget(self.comboBox_2)
-        aliasLayout.addSpacing(25)  # Простой отступ в 20 пикселей
-        
-        # Создаем кнопку "Очистить"
-        self.clearAliasButton = QtWidgets.QPushButton("Очистити Аліаси")
-
-        
-
-        aliasLayout.addWidget(self.clearAliasButton)
+        aliasLayout.addStretch()  # Добавляем растяжение для выравнивания
 
         # Создаем вертикальный layout для кнопок управления
-        buttonLayout = QtWidgets.QVBoxLayout()
-        
+        buttonLayout = QtWidgets.QVBoxLayout()  # Оставляем QVBoxLayout
+        buttonLayout.setContentsMargins(5, 0, 0, 0)  # Убираем отступы
+
+        # Добавляем отступ сверху для кнопок
+        buttonLayout.addSpacing(25)  # Увеличьте значение для большего отступа
+
         # Создаем кнопки
         self.addAliasButton = QtWidgets.QPushButton("Додати Аліас")
         self.removeAliasButton = QtWidgets.QPushButton("Видалити Аліас")
         self.importCsvButton = QtWidgets.QPushButton("Імпорт з CSV")
-        
-        # Добавляем пустое пространство сверху кнопок для выравнивания с комбобоксами
-        buttonLayout.addSpacing(self.label_mail.sizeHint().height())
+
+        # Устанавливаем фиксированную ширину для кнопок
+        self.addAliasButton.setFixedWidth(145)
+        self.removeAliasButton.setFixedWidth(145)
+        self.importCsvButton.setFixedWidth(145)
+
+        # Добавляем кнопки в вертикальный layout
         buttonLayout.addWidget(self.addAliasButton)
         buttonLayout.addWidget(self.removeAliasButton)
         buttonLayout.addWidget(self.importCsvButton)
+
+        
+
+        # Создаем кнопку "Очистити Аліаси"
+        self.clearAliasButton = QtWidgets.QPushButton("Очистити Аліаси")
+        self.clearAliasButton.setFixedWidth(145)  # Устанавливаем фиксированную ширину
+
+        # Добавляем кнопку "Очистити Аліаси" в вертикальный layout
+        buttonLayout.addWidget(self.clearAliasButton)
+
+        # Добавляем пустое пространство для выравнивания
         buttonLayout.addStretch()  # Добавляем растяжение для выравнивания
-        
-        # Добавляем все layouts в основной горизонтальный
-        comboBoxMainLayout.addLayout(mailboxLayout)
-        comboBoxMainLayout.addLayout(aliasLayout)
-        comboBoxMainLayout.addLayout(buttonLayout)
-        
+
+        # Создаем горизонтальный layout для комбобоксов и кнопок
+        mainLayout = QtWidgets.QHBoxLayout()  # Новый горизонтальный layout
+        mainLayout.addLayout(mailboxLayout)
+        mainLayout.addSpacing(8)  # Добавляем горизонтальный отступ между комбобоксами
+        mainLayout.addLayout(aliasLayout)
+        mainLayout.addLayout(buttonLayout)  # Добавляем вертикальный layout с кнопками
+
         # Добавляем контейнер в главный layout
-        self.mainLayout.addWidget(comboBoxContainer)
+        self.mainLayout.addLayout(mainLayout)
 
         # Подключаем кнопку "Очистить" к функции очистки
         self.clearAliasButton.clicked.connect(self.clearAliasComboBox)
@@ -373,7 +389,7 @@ if __name__ == "__main__":
     MainWindow = QtWidgets.QMainWindow()
     icon = QtGui.QIcon(resource_path('icons/icon.png'))
     MainWindow.setWindowIcon(icon)
-    MainWindow.setFixedSize(500, 200) 
+    MainWindow.setFixedSize(500, 220) 
 
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
