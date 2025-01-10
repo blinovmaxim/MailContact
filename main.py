@@ -209,26 +209,56 @@ class Ui_MainWindow(object):
     def updateAliasComboBox(self):
         model = QtGui.QStandardItemModel()
         self.comboBox_2.setModel(model)
+        
         # Добавляем пункт "Виберіть Аліас" всегда на первом месте
         placeholder_item = QtGui.QStandardItem("Виберіть Аліас")
         placeholder_item.setFlags(QtCore.Qt.ItemIsEnabled)  # Только для чтения
         model.appendRow(placeholder_item)
 
         for alias in self.alias_list:
-            # Форматируем строку с двумя полями
+            # Форматируем строку со всеми полями
             item_text = f"{alias['First Name']} <{alias['EmailAddress']}>"
+            
+            # Добавляем рабочие телефоны, если есть
+            if 'BusinessPhones' in alias and alias['BusinessPhones']:
+                item_text += f" | Роб: {', '.join(alias['BusinessPhones'])}"
+            
+            # Добавляем мобильный телефон, если есть
+            if 'MobilePhone' in alias and alias['MobilePhone']:
+                item_text += f" | Моб: {alias['MobilePhone']}"
+            
             item = QtGui.QStandardItem(item_text)
             model.appendRow(item)
+        
         self.comboBox_2.setCurrentText("Виберіть Аліас")
 
     # Добавить новый алиас в список
     def addAlias(self):
         alias_name, ok = QtWidgets.QInputDialog.getText(None, "Додати аліас", "Введіть ім'я аліасу:")
+        if not ok or not alias_name.strip():
+            return
+        
         alias_email, ok_email = QtWidgets.QInputDialog.getText(None, "Додати аліас", "Введіть пошту аліасу:")
+        if not ok_email or not alias_email.strip():
+            return
+       
+        mobile_phone, ok_mobile = QtWidgets.QInputDialog.getText(
+            None, 
+            "Додати аліас", 
+            "Введіть мобільний телефон:"
+        )
+        if not ok_mobile:
+            return
 
-        if ok and alias_name.strip() and ok_email and alias_email.strip():
-            self.alias_list.append({"First Name": alias_name.strip(), "EmailAddress": alias_email.strip()})
-            self.updateAliasComboBox()
+        # Создаем словарь с данными алиаса
+        new_alias = {
+            "First Name": alias_name.strip(),
+            "EmailAddress": alias_email.strip(),
+            "MobilePhone": mobile_phone.strip()
+        }
+        
+        self.alias_list.append(new_alias)
+        self.updateAliasComboBox()
 
     # Удалить выбранный алиас из списка
     def removeAlias(self):
@@ -312,7 +342,12 @@ class Ui_MainWindow(object):
 
         # Создаем и добавляем контакт для каждого алиаса
         for alias in all_aliases:
-            contact_data = create_contact_data(alias["First Name"], alias["EmailAddress"])
+            contact_data = create_contact_data(
+                alias["First Name"], 
+                alias["EmailAddress"],
+                alias.get("MobilePhone", "")
+            )
+            
             # Добавляем контакт в каждый выбранный ящик
             for mailbox in selected_mailboxes:
                 try:

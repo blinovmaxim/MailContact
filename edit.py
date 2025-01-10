@@ -47,6 +47,17 @@ def edit_action(self):
     if not ok2:
         return
 
+    # Добавляем диалог для мобильного телефона
+    current_mobile = selected_alias.get("MobilePhone", "")
+    new_mobile_phone, ok4 = QtWidgets.QInputDialog.getText(
+        None,
+        "Редагування контакту",
+        "Новий мобільний телефон:",
+        text=current_mobile
+    )
+    if not ok4:
+        return
+
     # Обновляем контакт в каждом выбранном ящике
     errors = []
     success = []
@@ -57,7 +68,8 @@ def edit_action(self):
                 mailbox, 
                 selected_alias["EmailAddress"], 
                 new_name, 
-                new_email
+                new_email,
+                new_mobile_phone.strip()
             )
             success.append(mailbox)
         except Exception as e:
@@ -69,6 +81,7 @@ def edit_action(self):
             alias["EmailAddress"] == selected_alias["EmailAddress"]):
             alias["First Name"] = new_name
             alias["EmailAddress"] = new_email
+            alias["MobilePhone"] = new_mobile_phone.strip()
             break
 
     # Обновляем комбобокс
@@ -87,7 +100,7 @@ def edit_action(self):
     msg_box.setText(result_message)
     msg_box.exec_()
 
-def update_contact(user_id, old_email, new_name, new_email):
+def update_contact(user_id, old_email, new_name, new_email, mobile_phone=None):
     """Обновляет существующий контакт в почтовом ящике."""
     access_token = get_access_token()
     
@@ -116,7 +129,8 @@ def update_contact(user_id, old_email, new_name, new_email):
             {
                 "address": new_email
             }
-        ]
+        ],
+        "mobilePhone": mobile_phone if mobile_phone else ""
     }
 
     update_response = requests.patch(update_url, headers=headers, json=update_data)

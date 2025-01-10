@@ -62,16 +62,17 @@ def add_contact_to_mailbox(user_id, contact_data):
         print(f"Ошибка при добавлении контакта в ящик {user_id}: {response.status_code} - {response.text}")
 
 # Функция для создания данных контакта
-def create_contact_data(given_name, email_address):
-    return {
+def create_contact_data(given_name, email_address, mobile_phone=None):
+    contact_data = {
         "givenName": given_name,
         "emailAddresses": [
             {
                 "address": email_address
             }
         ],
-        "businessPhones": []  # Можно добавить телефоны, если нужно
+        "mobilePhone": mobile_phone if mobile_phone else ""
     }
+    return contact_data
 
 
 def get_contact_id(user_id, email_address):

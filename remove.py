@@ -16,7 +16,10 @@ def remove_alias_from_selected_mailboxes(self): # Получаем выбран�
     for index in range(1, self.comboBox.count()):
         item = self.comboBox.model().item(index)
         if item.checkState() == QtCore.Qt.Checked:
-            selected_mailboxes.append(item.text())
+            mailbox = item.text()
+            # Пропускаем элемент "Всі"
+            if mailbox != "Всі":
+                selected_mailboxes.append(mailbox)
 
     if not selected_mailboxes:
         msg_box = QtWidgets.QMessageBox()

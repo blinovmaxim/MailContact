@@ -6,15 +6,28 @@ def importAliasesFromCSV(self):
         Открывает диалоговое окно для выбора CSV файла и загружает алиасы в comboBox_2.
         """
         options = QtWidgets.QFileDialog.Options()
-        filePath, _ = QtWidgets.QFileDialog.getOpenFileName(None, "Виберіть файл CSV", "", "CSV Files (*.csv);;All Files (*)", options=options)
+        filePath, _ = QtWidgets.QFileDialog.getOpenFileName(
+            None, 
+            "Виберіть файл CSV", 
+            "", 
+            "CSV Files (*.csv);;All Files (*)", 
+            options=options
+        )
 
         if not filePath:
-            return  # Если файл не выбран, ничего не делаем
+            return
 
         try:
             with open(filePath, mode='r', encoding='utf-8') as file:
                 csv_reader = csv.DictReader(file)
-                aliases = [{'First Name': row['First Name'], 'EmailAddress': row['EmailAddress']} for row in csv_reader]
+                aliases = []
+                for row in csv_reader:
+                    alias = {
+                        'First Name': row['First Name'],
+                        'EmailAddress': row['EmailAddress'],
+                        'MobilePhone': row.get('MobilePhone', '')
+                    }
+                    aliases.append(alias)
 
             # Добавляем алиасы в список
             self.alias_list.extend(aliases)
